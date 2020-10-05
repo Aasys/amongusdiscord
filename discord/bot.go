@@ -501,9 +501,26 @@ func (guild *GuildState) handleMessageCreate(s *discordgo.Session, m *discordgo.
 		return
 	}
 
+	if m.ChannelID != "604888838166544418" && m.ChannelID != "762716187657240617" {
+		return
+	}
+
 	g, err := s.State.Guild(guild.PersistentGuildData.GuildID)
 	if err != nil {
 		log.Println(err)
+	}
+
+	isAmongUsVoice := false
+	for _, v := range g.VoiceStates {
+		//if the user is detected in a voice channel
+		if v.UserID == m.Author.ID && v.ChannelID == "761491487560171520" {
+			isAmongUsVoice = true
+		}
+	}
+
+	if !isAmongUsVoice {
+		s.ChannelMessageSend(m.ChannelID, "Join Among Us voice channel first!!")
+		return
 	}
 
 	contents := m.Content
@@ -537,6 +554,7 @@ func (guild *GuildState) handleMessageCreate(s *discordgo.Session, m *discordgo.
 					s.ChannelMessageSend(m.ChannelID, helpResponse(Version, guild.PersistentGuildData.CommandPrefix))
 					break
 				case Track:
+					return
 					if len(args[1:]) == 0 {
 						//TODO print usage of this command specifically
 						s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("You used this command incorrectly! Please refer to `%s help` for proper command usage", guild.PersistentGuildData.CommandPrefix))
