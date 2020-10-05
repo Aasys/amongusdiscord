@@ -510,22 +510,23 @@ func (guild *GuildState) handleMessageCreate(s *discordgo.Session, m *discordgo.
 		log.Println(err)
 	}
 
-	isAmongUsVoice := false
-	for _, v := range g.VoiceStates {
-		//if the user is detected in a voice channel
-		if v.UserID == m.Author.ID && v.ChannelID == "761491487560171520" {
-			isAmongUsVoice = true
-		}
-	}
-
-	if !isAmongUsVoice {
-		s.ChannelMessageSend(m.ChannelID, "Join Among Us voice channel first!!")
-		return
-	}
-
 	contents := m.Content
 
 	if strings.HasPrefix(contents, guild.PersistentGuildData.CommandPrefix) {
+
+		isAmongUsVoice := false
+		for _, v := range g.VoiceStates {
+			//if the user is detected in a voice channel
+			if v.UserID == m.Author.ID && v.ChannelID == "761491487560171520" {
+				isAmongUsVoice = true
+			}
+		}
+
+		if !isAmongUsVoice {
+			s.ChannelMessageSend(m.ChannelID, "Join Among Us voice channel first!!")
+			return
+		}
+
 		//either BOTH the admin/roles are empty, or the user fulfills EITHER perm "bucket"
 		perms := len(guild.PersistentGuildData.AdminUserIDs) == 0 && len(guild.PersistentGuildData.PermissionedRoleIDs) == 0
 		if !perms {
